@@ -1,0 +1,32 @@
+{
+  "name": "workflow",
+  "version": "1.0.0",
+  "description": "workflow backend to support execution with support of long-running task...",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "workflow",
+    "bull",
+    "jsonLogic",
+    "Azure",
+    "functions",
+    "job",
+    "queue",
+    "amqp"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "bull": "^3.18.0",
+    "bull-arena": "^2.6.3",
+    "express": "^4.17.1",
+    "json-logic-js": "^1.2.2",
+    "jsonpath": "^1.0.2",
+    "moment": "^2.29.0",
+    "redis": "^3.0.2"
+  }
+}
