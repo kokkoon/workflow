@@ -8,19 +8,28 @@ const REDIS_URL = keys.redisURL;
 const flowQueue = new Queue(QUEUE_NAME, REDIS_URL);
 const moment = require('moment');
 
+const doFunction = (job, node) => {
+  new Promise(res => setTimeout(res, 100))
+};
+
+var level = 0;
+var currentNode = {};
 
 //exec first node and continue recurse
-var exec1 = (job, actions, def) => {
+var exec1 = async (job, actions, def) => {
   if (actions.length > 0) {
     const first = actions.shift();
 
     if (first.type == "logic") {
       switch (first.name) {
         case "IF_ELSE":
+          level=level+1;
+          currentNode = {...first};
+          job.log(`Start branch: ${first.title}`)
           if (jsonLogic.apply(first.rules, def[first.data])) {
-            exec1(job, JSONPath.query(first, '$..branches[?(@.condition==true)].actions')[0], def)
+            await exec1(job, JSONPath.query(first, '$..branches[?(@.condition==true)].actions')[0], def)
           } else {
-            exec1(job, JSONPath.query(first, '$..branches[?(@.condition==false)].actions')[0], def)
+            await exec1(job, JSONPath.query(first, '$..branches[?(@.condition==false)].actions')[0], def)
           }
           break
         case "IF_TRUE":
@@ -37,12 +46,13 @@ var exec1 = (job, actions, def) => {
       job.log(loginst);
 
       // do task execution
-      setTimeout(() => {
-        //finish doing task..
-        loginst = (moment().format()) + `: Ended ${first.name}, ${first.title}`;
-        console.log(actions.length, loginst);
-        job.log(loginst);
-      }, 200)
+      await doFunction(job, first)
+     
+      
+      //finish doing task..
+      loginst = (moment().format()) + `: Ended ${first.name}, ${first.title}`;
+      console.log(actions.length, loginst);
+      job.log(loginst);
 
       
     }
@@ -50,7 +60,12 @@ var exec1 = (job, actions, def) => {
     
     //return "Active";
   } else {
-    job.log("Workflow completed");
+    if (level < 1) {
+      job.log("Workflow completed")
+    } else {
+      job.log(`Exit branch: ${currentNode.title}`);
+      level = level -1;
+    };
     //return "Completed";
   }
 }
