@@ -34,7 +34,7 @@
                             {"<": [{"var": "IntegerVar"}, 10]},
                             {"in": ["Friday", {"var": "DaysVar"}]}
                         ]},
-                "data": "definition.variables",
+                "data": "variables",
                 "branches": [
                     {
                         "condition": false,

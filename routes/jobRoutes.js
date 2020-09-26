@@ -99,7 +99,27 @@ module.exports = app => {
 		})
   })
 
+  app.post('/resumejob/:jobId', async function(req, res) {
+	const jobId = req.params.jobId;
+	const job = await flowQueue.getJob(jobId);
+	const jobData = {...job.data};
+	flowQueue.getJobLogs(jobId)
+		.then(logs => {
+			const jobLogs = {...logs}
+			console.log("jobLogs:", jobLogs);
+			job.remove();
+			flowQueue.add(jobData, {jobId: jobId})
+				.then(resumedJob => {
+					jobLogs.logs.forEach(log => {
+						resumedJob.log(log);
+					});
+				})
+				.then(resumedJob => {
+					res.send(resumedJob)
+				})
+		})
 
+  })
 
 	app.get('/startflow', function(req, res) {
 		const url = URL.parse(req.url, true)

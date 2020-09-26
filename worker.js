@@ -8,7 +8,7 @@ const flowrunner = require('./flowrunner');
 
 flowQueue.process(function(job, done) {
   console.log(job.data)
-  job.log("start running workflow...")
+  job.log((job.data.state && job.data.state=="Paused")? "Resuming workflow...": "Starting workflow...")
   flowrunner.startflow(job)
   //job.moveToCompleted("stopped", true)
   done();
